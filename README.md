@@ -227,3 +227,10 @@ above.
 Check that `pdfplumber` could actually extract text from that PDF (rerun
 `python -m src.rag.ingest` and watch for a "no extractable text found"
 warning) — if the PDF is a scanned image, it needs OCR first.
+
+---
+
+## Author
+
+**Karan Bansal**  
+Roll No.: **24B3003**
