@@ -207,7 +207,7 @@ iitb-insti-assist/
 │       └── llm.py              # provider-agnostic chat model factory
 ```
 
-## 9. Troubleshooting
+## 7. Troubleshooting
 
 **Streamlit prints a wall of `ModuleNotFoundError: No module named 'torchvision'` on startup.**
 This is harmless. Streamlit's file-watcher tries to inspect every
