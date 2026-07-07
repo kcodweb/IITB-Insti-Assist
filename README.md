@@ -1,4 +1,4 @@
-# 🎓 IITB Insti-Assist — Academic Assistant
+# 🎓 IITB Insti-Assist - Academic Assistant
 
 A multi-agent, RAG-grounded assistant for IIT Bombay academic-policy questions
 (course registration, grading, academic calendar, exam rules, branch change).
@@ -9,7 +9,7 @@ pipeline *as* a small team of coordinated agents instead of one monolithic
 retrieve-then-generate script.
 
 > ℹ️ **Documents included**: `data/raw/` ships with two real IIT Bombay
-> source documents — the **UG Rules & Regulations** (`ugrulebook.pdf`) and the
+> source documents, the **UG Rules & Regulations** (`ugrulebook.pdf`) and the
 > **Academic Calendar 2026-27** (`Academic_Calendar_2026-27_FINAL.pdf`). See
 > "Adding your documents" below if you want to add more.
 
@@ -135,14 +135,9 @@ Notes:
 
 ## 4. Running it
 
-**Web UI (recommended):**
+**Web UI**
 ```bash
 streamlit run app.py
-```
-
-**CLI:**
-```bash
-python main.py "What is the minimum attendance required to sit an exam?"
 ```
 
 **Rebuild the vector index manually** (e.g. after editing `data/raw/`):
@@ -207,24 +202,3 @@ iitb-insti-assist/
 │   └── utils/
 │       └── llm.py              # provider-agnostic chat model factory
 ```
-
-## 9. Troubleshooting
-
-**Streamlit prints a wall of `ModuleNotFoundError: No module named 'torchvision'` on startup.**
-This is harmless. Streamlit's file-watcher tries to inspect every
-submodule `transformers` *could* lazily import (including obscure
-vision-model code that needs `torchvision`), which you don't have and don't
-need — we only use `transformers` indirectly for text embeddings via
-`sentence-transformers`. It's noisy console output, not a crash; the app
-still runs. To silence it, either:
-- run with the watcher off: `streamlit run app.py --server.fileWatcherType none`, or
-- set `STREAMLIT_SERVER_FILE_WATCHER_TYPE=none` as an environment variable.
-
-**`FileNotFoundError: No .txt or .pdf documents found in data/raw`**
-You haven't added any source documents yet — see "Adding your documents"
-above.
-
-**A retrieved answer is always "I don't know" even for something you know is in a PDF.**
-Check that `pdfplumber` could actually extract text from that PDF (rerun
-`python -m src.rag.ingest` and watch for a "no extractable text found"
-warning) — if the PDF is a scanned image, it needs OCR first.
