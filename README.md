@@ -1,5 +1,8 @@
 # 🎓 IITB Insti-Assist - Academic Assistant
 
+[![Tests](https://github.com/kcodweb/IITB-Insti-Assist/actions/workflows/tests.yml/badge.svg)](https://github.com/kcodweb/IITB-Insti-Assist/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 ## Demo
 
 ![IITB Insti-Assist Demo](assets/demo.png)
@@ -276,6 +279,8 @@ IITB-Insti-Assist/
 ├── requirements.txt           # + requirements-dev.txt for tests
 ├── .env.example
 ├── .streamlit/config.toml     # disables Streamlit's noisy file watcher
+├── .github/workflows/tests.yml  # CI: runs pytest on every push / PR
+├── LICENSE                    # MIT (code only)
 ├── data/
 │   ├── raw/                   # source PDFs (UG Rulebook, Academic Calendar 2026-27)
 │   ├── sources.json           # optional friendly titles for each document
@@ -328,3 +333,9 @@ value.
 
 **Karan Bansal**  
 Roll No.: **24B3003**
+
+## License
+
+The code is released under the [MIT License](LICENSE). The PDFs in
+`data/raw/` are official IIT Bombay documents, included for reference only;
+they are not covered by the MIT License.
