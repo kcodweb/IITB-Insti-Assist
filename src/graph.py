@@ -25,21 +25,27 @@ trace via state["history"].
 
 from __future__ import annotations
 
-from langgraph.graph import StateGraph, END
+from functools import lru_cache
+from typing import Iterator
 
-from src.state import AgentState
-from src.agents.supervisor import supervisor_node
-from src.agents.retrieval_agent import retrieval_agent_node
+from langgraph.graph import END, StateGraph
+
+from src import config
 from src.agents.answer_agent import answer_agent_node
 from src.agents.critic_agent import critic_agent_node
 from src.agents.finish_agent import finish_node
+from src.agents.retrieval_agent import retrieval_agent_node
+from src.agents.supervisor import supervisor_node
+from src.state import AgentState, ChatMessage
 
 
 def _route(state: AgentState) -> str:
     return state["next"]
 
 
+@lru_cache(maxsize=1)
 def build_graph():
+    """Compile the graph once per process; it's stateless between runs."""
     graph = StateGraph(AgentState)
 
     graph.add_node("supervisor", supervisor_node)
@@ -70,13 +76,40 @@ def build_graph():
     return graph.compile()
 
 
-def run(question: str, max_revisions: int = 2) -> AgentState:
-    app = build_graph()
-    initial_state: AgentState = {
+def _initial_state(
+    question: str, chat_history: list[ChatMessage] | None, max_revisions: int
+) -> AgentState:
+    return {
         "question": question,
+        "chat_history": list(chat_history or []),
         "revision_count": 0,
         "max_revisions": max_revisions,
         "history": [],
     }
-    final_state = app.invoke(initial_state)
-    return final_state
+
+
+def run(
+    question: str,
+    chat_history: list[ChatMessage] | None = None,
+    max_revisions: int = config.MAX_REVISIONS,
+) -> AgentState:
+    """Answer one question (optionally as a follow-up in a conversation)."""
+    return build_graph().invoke(_initial_state(question, chat_history, max_revisions))
+
+
+def stream(
+    question: str,
+    chat_history: list[ChatMessage] | None = None,
+    max_revisions: int = config.MAX_REVISIONS,
+) -> Iterator[tuple[list[str], AgentState]]:
+    """
+    Like run(), but yields (new_trace_lines, state) after every node so a
+    UI can show the agents working live. The last state yielded is final.
+    """
+    seen = 0
+    for state in build_graph().stream(
+        _initial_state(question, chat_history, max_revisions), stream_mode="values"
+    ):
+        trace = state.get("history", [])
+        yield trace[seen:], state
+        seen = len(trace)

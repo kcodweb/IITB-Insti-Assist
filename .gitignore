@@ -5,4 +5,4 @@ __pycache__/
 venv/
 data/chroma_db/
 .pytest_cache/
-.streamlit/
+.streamlit/secrets.toml

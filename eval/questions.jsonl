@@ -1,0 +1,68 @@
+{"id": "r01", "kind": "rulebook", "question": "What is the minimum attendance I need so that I don't get a DX grade?", "source": "ugrulebook.pdf", "pages": [28, 29], "expect_any": ["80"]}
+{"id": "r02", "kind": "rulebook", "question": "How many credits do I need to complete a minor?", "source": "ugrulebook.pdf", "pages": [13, 51], "expect_any": ["30"]}
+{"id": "r03", "kind": "rulebook", "question": "How many additional credits are required to earn Honours?", "source": "ugrulebook.pdf", "pages": [13, 51], "expect_any": ["24"]}
+{"id": "r04", "kind": "rulebook", "question": "What is the maximum number of credits a Category I student can register for in a semester?", "source": "ugrulebook.pdf", "pages": [21], "expect_any": ["54"]}
+{"id": "r05", "kind": "rulebook", "question": "What is the credit limit for students in the Academic Rehabilitation Programme?", "source": "ugrulebook.pdf", "pages": [21, 41], "expect_any": ["24"]}
+{"id": "r06", "kind": "rulebook", "question": "What CPI do I need to be placed in academic standing Category I?", "source": "ugrulebook.pdf", "pages": [20], "expect_any": ["8"]}
+{"id": "r07", "kind": "rulebook", "question": "How many grade points is a BC grade worth?", "source": "ugrulebook.pdf", "pages": [28, 51], "expect_any": ["7"]}
+{"id": "r08", "kind": "rulebook", "question": "Can an AP grade be given in a course that has only 30 students?", "source": "ugrulebook.pdf", "pages": [28], "expect_any": ["50"]}
+{"id": "r09", "kind": "rulebook", "question": "How is the SPI calculated?", "source": "ugrulebook.pdf", "pages": [30, 52], "expect_any": ["weighted average", "Semester Grade Points"]}
+{"id": "r10", "kind": "rulebook", "question": "Once I clear a course I had failed, does the old FR grade still count in my CPI?", "source": "ugrulebook.pdf", "pages": [31], "expect_any": ["new grade", "only once", "not the fail"]}
+{"id": "r11", "kind": "rulebook", "question": "How many courses can a UG student audit during the whole programme?", "source": "ugrulebook.pdf", "pages": [22], "expect_any": ["two", "TWO", "2"]}
+{"id": "r12", "kind": "rulebook", "question": "What weightage does the end-semester exam carry in a theory course?", "source": "ugrulebook.pdf", "pages": [24], "expect_any": ["40"]}
+{"id": "r13", "kind": "rulebook", "question": "What grade do I get if I don't appear for the end-semester exam?", "source": "ugrulebook.pdf", "pages": [24], "expect_any": ["II"]}
+{"id": "r14", "kind": "rulebook", "question": "What is the FF grade and what is the highest grade possible after the re-exam?", "source": "ugrulebook.pdf", "pages": [29], "expect_any": ["DD"]}
+{"id": "r15", "kind": "rulebook", "question": "What eligibility CPI is required to apply for a branch change to the LASE programme?", "source": "ugrulebook.pdf", "pages": [34], "expect_any": ["7.0", "7"]}
+{"id": "r16", "kind": "rulebook", "question": "Can students admitted through JEE Advanced 2023 change their branch?", "source": "ugrulebook.pdf", "pages": [34], "expect_any": ["eliminat", "not"]}
+{"id": "r17", "kind": "rulebook", "question": "What is the minimum number of credits I must register for each semester?", "source": "ugrulebook.pdf", "pages": [18, 21], "expect_any": ["18"]}
+{"id": "r18", "kind": "rulebook", "question": "How many credits of NPTEL courses can a regular student take in lieu of electives?", "source": "ugrulebook.pdf", "pages": [33], "expect_any": ["12"]}
+{"id": "r19", "kind": "rulebook", "question": "How many IIT Bombay credits is a 12-week NPTEL course equivalent to?", "source": "ugrulebook.pdf", "pages": [33], "expect_any": ["6"]}
+{"id": "r20", "kind": "rulebook", "question": "When does a student get transferred to the Academic Rehabilitation Programme?", "source": "ugrulebook.pdf", "pages": [20, 41], "expect_any": ["36"]}
+{"id": "r21", "kind": "rulebook", "question": "How much extra time do PwD students who use a scribe get in exams?", "source": "ugrulebook.pdf", "pages": [32, 33], "expect_any": ["20 minutes"]}
+{"id": "r22", "kind": "rulebook", "question": "For how long are evaluated answer scripts preserved?", "source": "ugrulebook.pdf", "pages": [32], "expect_any": ["one semester"]}
+{"id": "r23", "kind": "rulebook", "question": "For how many days can the head of the department sanction special leave?", "source": "ugrulebook.pdf", "pages": [49], "expect_any": ["5"]}
+{"id": "r24", "kind": "rulebook", "question": "What is the maximum planned break from studies a student can take?", "source": "ugrulebook.pdf", "pages": [49], "expect_any": ["two"]}
+{"id": "r25", "kind": "rulebook", "question": "What CPI is needed at the end of the sixth semester to apply for IDDDP?", "source": "ugrulebook.pdf", "pages": [42], "expect_any": ["7.5"]}
+{"id": "r26", "kind": "rulebook", "question": "How are the credits of a course calculated from its lecture, tutorial and lab hours?", "source": "ugrulebook.pdf", "pages": [10, 50], "expect_any": ["2xL", "2L", "2 x L", "2 × L", "multiplying"]}
+{"id": "r27", "kind": "rulebook", "question": "What is the minimum number of students required to run an elective course?", "source": "ugrulebook.pdf", "pages": [20], "expect_any": ["5"]}
+{"id": "r28", "kind": "rulebook", "question": "Within how many days of the first lecture can I drop a summer course?", "source": "ugrulebook.pdf", "pages": [19], "expect_any": ["7"]}
+{"id": "r29", "kind": "rulebook", "question": "How many credits of backlog courses can I take in a summer term?", "source": "ugrulebook.pdf", "pages": [19], "expect_any": ["24"]}
+{"id": "r30", "kind": "rulebook", "question": "Can B.Tech students leave the institute before completing four years?", "source": "ugrulebook.pdf", "pages": [41], "expect_any": ["three years"]}
+{"id": "r31", "kind": "rulebook", "question": "How many credits must be completed to get an exit degree?", "source": "ugrulebook.pdf", "pages": [37], "expect_any": ["160"]}
+{"id": "r32", "kind": "rulebook", "question": "What is URA02 and how many credits does it carry?", "source": "ugrulebook.pdf", "pages": [40], "expect_any": ["six", "6"]}
+{"id": "r33", "kind": "rulebook", "question": "How many days of leave do dual degree students get in their final year?", "source": "ugrulebook.pdf", "pages": [50], "expect_any": ["15"]}
+{"id": "r34", "kind": "rulebook", "question": "Can I drop a semester after DX grades have been awarded?", "source": "ugrulebook.pdf", "pages": [18], "expect_any": ["not"]}
+{"id": "r35", "kind": "rulebook", "question": "Can my CPI be converted into a percentage?", "source": "ugrulebook.pdf", "pages": [50], "expect_any": ["10"]}
+{"id": "r36", "kind": "rulebook", "question": "What is the fine for submitting the DDP dissertation late?", "source": "ugrulebook.pdf", "pages": [26], "expect_any": ["5000"]}
+{"id": "c01", "kind": "calendar", "question": "When is pre-registration for minor courses in the Autumn 2026 semester?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [3], "expect_any": ["10 July 2026"]}
+{"id": "c02", "kind": "calendar", "question": "When do Autumn semester 2026 lectures begin?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [3], "expect_any": ["27 July 2026"]}
+{"id": "c03", "kind": "calendar", "question": "When are the mid-semester exams in Autumn 2026?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [4], "expect_any": ["12 Sep 2026", "12 September 2026"]}
+{"id": "c04", "kind": "calendar", "question": "When are the end-semester exams in the Spring 2027 semester?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [7], "expect_any": ["19 Apr 2027", "19 April 2027"]}
+{"id": "c05", "kind": "calendar", "question": "What is the last date for course adjustment in the Spring semester?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [6], "expect_any": ["11 Jan 2027", "11 January 2027"]}
+{"id": "c06", "kind": "calendar", "question": "When is the winter vacation?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [5], "expect_any": ["29 Nov 2026", "29 November 2026"]}
+{"id": "c07", "kind": "calendar", "question": "When does the summer vacation 2027 start?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [8], "expect_any": ["8 May 2027"]}
+{"id": "c08", "kind": "calendar", "question": "When will SPI and CPI be calculated for the Autumn semester?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [5], "expect_any": ["10 Dec 2026", "10 December 2026"]}
+{"id": "c09", "kind": "calendar", "question": "When are DX grades awarded for full-semester courses in Spring 2027?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [7], "expect_any": ["12 Apr 2027", "12 April 2027"]}
+{"id": "c10", "kind": "calendar", "question": "When is registration for the summer term 2027?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [9], "expect_any": ["15 May 2027"]}
+{"id": "c11", "kind": "calendar", "question": "What is the last date to pay Spring semester fees without a fine?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [5], "expect_any": ["15 Dec 2026", "15 December 2026"]}
+{"id": "c12", "kind": "calendar", "question": "When is the Spring session of the 65th Convocation?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [2, 12], "expect_any": ["27 Feb 2027", "27 February 2027"]}
+{"id": "c13", "kind": "calendar", "question": "Until when can I drop second half-semester courses in Autumn 2026?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [4], "expect_any": ["12 Oct 2026", "12 October 2026"]}
+{"id": "c14", "kind": "calendar", "question": "When is the application window for IDDDP conversion?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [8], "expect_any": ["18 June 2027"]}
+{"id": "c15", "kind": "calendar", "question": "When is the end-semester examination for the Autumn semester?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [5], "expect_any": ["9 Nov 2026", "9 November 2026"]}
+{"id": "c16", "kind": "calendar", "question": "When are FF and II grades auto-converted to FR after the Spring semester?", "source": "Academic_Calendar_2026-27_FINAL.pdf", "pages": [8], "expect_any": ["18 May 2027"]}
+{"id": "o01", "kind": "out_of_scope", "question": "What is the capital of France?"}
+{"id": "o02", "kind": "out_of_scope", "question": "How do I cook chicken biryani?"}
+{"id": "o03", "kind": "out_of_scope", "question": "Write a Python function to reverse a linked list."}
+{"id": "o04", "kind": "out_of_scope", "question": "Who won the 2022 FIFA World Cup?"}
+{"id": "o05", "kind": "out_of_scope", "question": "What's the weather in Mumbai today?"}
+{"id": "o06", "kind": "out_of_scope", "question": "Recommend a good laptop for programming under 60k."}
+{"id": "o07", "kind": "out_of_scope", "question": "Explain how transformers work in deep learning."}
+{"id": "o08", "kind": "out_of_scope", "question": "What is the best movie of 2025?"}
+{"id": "u01", "kind": "unanswerable", "question": "What are the mess timings in Hostel 5?"}
+{"id": "u02", "kind": "unanswerable", "question": "How do I apply for a hostel room change?"}
+{"id": "u03", "kind": "unanswerable", "question": "What is the B.Tech tuition fee per semester in rupees?"}
+{"id": "u04", "kind": "unanswerable", "question": "Who is the current Dean of Academic Programmes?"}
+{"id": "u05", "kind": "unanswerable", "question": "What are the Central Library opening hours?"}
+{"id": "u06", "kind": "unanswerable", "question": "How do I register for the Inter IIT sports meet?"}
+{"id": "u07", "kind": "unanswerable", "question": "What is the placement season schedule for 2026?"}
+{"id": "u08", "kind": "unanswerable", "question": "What JEE rank do I need for Computer Science at IIT Bombay?"}

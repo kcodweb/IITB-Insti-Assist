@@ -1,81 +1,81 @@
 """
 Answer agent.
 
-Responsibility: draft an answer USING ONLY the retrieved chunks. It
-never uses outside knowledge, and it must cite which source(s) it drew
-from. If the critic sends it back with feedback, it revises the draft
-taking that feedback into account.
+Responsibility: draft an answer USING ONLY the retrieved chunks, citing
+the numbered passage behind every claim inline ([1], [2]...). It never
+uses outside knowledge. If the critic sends it back with feedback, it
+revises its previous draft taking that feedback into account.
 """
 
 from __future__ import annotations
 
+from src import config
 from src.state import AgentState
-from src.utils.llm import get_chat_model, extract_text
+from src.utils import llm as llm_utils
+from src.utils.grounding import format_context, format_history, parse_citations
 
 SYSTEM_PROMPT = """You are the Answer Agent inside IITB Insti-Assist, a RAG \
-assistant for IIT Bombay's academic policies (course registration, grading, \
-academic calendar, exam rules).
+assistant for IIT Bombay's academic rules (UG Rules & Regulations) and \
+academic calendar.
 
 Hard rules:
-1. Answer ONLY using the CONTEXT provided below. Never use outside knowledge \
-about IIT Bombay or any other institute, even if you think you know the answer.
-2. If the context does not fully answer the question, say so explicitly \
-rather than filling gaps with assumptions.
-3. Every factual claim you make must be traceable to one of the context \
-chunks. Mention the source file name(s) you relied on at the end, under \
-"Sources:".
-4. Be concise and direct — this is a policy lookup assistant, not an essay.
+1. Answer ONLY using the numbered CONTEXT passages. Never use outside knowledge \
+about IIT Bombay or anything else, even if you think you know the answer.
+2. Cite the passage(s) behind every factual sentence inline, like [1] or [2][3]. \
+Don't add a separate "Sources" list — the app shows sources itself.
+3. If the context only partly answers the question, answer that part and say \
+plainly what the documents don't specify. If it doesn't answer it at all, say \
+"The documents I have don't cover this." and nothing else.
+4. Copy numbers, dates and names exactly as the context gives them, and keep \
+track of which semester (Autumn / Spring / Summer), programme or category a \
+rule or date belongs to — the passage headers in [brackets] tell you.
+5. Be concise: lead with the direct answer in 1-3 sentences; use a short \
+bullet list only when there are several conditions, steps or dates.
 """
 
 
-def _format_context(chunks: list[dict]) -> str:
-    parts = []
-    for c in chunks:
-        page_note = f", page {c['page']}" if "page" in c else ""
-        parts.append(f"[{c['chunk_id']}] (source: {c['source']}{page_note})\n{c['text']}")
-    return "\n\n---\n\n".join(parts)
-
-
 def answer_agent_node(state: AgentState) -> AgentState:
-    history = state.get("history", [])
     question = state["question"]
+    search_query = state.get("search_query") or question
     chunks = state.get("retrieved_chunks", [])
-    critique = state.get("critique", "")
     revision_count = state.get("revision_count", 0)
+    is_revision = "draft_answer" in state and state.get("critique")
 
-    context = _format_context(chunks)
-    sources_used = sorted({c["source"] for c in chunks})
-
-    user_prompt = f"CONTEXT:\n{context}\n\nQUESTION: {question}"
-    if critique:
-        user_prompt += (
-            f"\n\nA reviewer flagged this issue with your previous draft: "
-            f"\"{critique}\"\nRevise your answer to fix that issue, still using "
-            f"only the CONTEXT above."
+    prompt = ""
+    if state.get("chat_history"):
+        prompt += (
+            "CONVERSATION SO FAR (only for understanding the question — facts must "
+            f"still come from the CONTEXT):\n{format_history(state['chat_history'], config.HISTORY_WINDOW)}\n\n"
+        )
+    prompt += f"CONTEXT:\n{format_context(chunks)}\n\nQUESTION: {question}"
+    if search_query != question:
+        prompt += f"\n(Interpreted as: {search_query})"
+    if is_revision:
+        prompt += (
+            f"\n\nYOUR PREVIOUS DRAFT:\n{state['draft_answer']}\n\n"
+            f"A reviewer rejected it: \"{state['critique']}\"\n"
+            "Rewrite the answer to fix that problem, still using only the CONTEXT."
         )
 
-    llm = get_chat_model(temperature=0.0)
+    llm = llm_utils.get_chat_model(temperature=0.0)
     response = llm.invoke(
         [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": prompt},
         ]
     )
-    draft = extract_text(response)
+    draft = llm_utils.extract_text(response).strip()
 
-    draft_version = state.get("draft_version", 0) + 1
-
-    if critique:
+    if is_revision:
         revision_count += 1
-        history.append(f"[answer_agent] revised draft (revision #{revision_count})")
+        line = f"[answer_agent] revised draft (revision #{revision_count})"
     else:
-        history.append("[answer_agent] wrote initial draft")
+        line = "[answer_agent] wrote initial draft"
 
     return {
-        **state,
         "draft_answer": draft,
-        "sources_used": sources_used,
-        "draft_version": draft_version,
+        "citations": [n for n in parse_citations(draft) if 1 <= n <= len(chunks)],
+        "draft_version": state.get("draft_version", 0) + 1,
         "revision_count": revision_count,
-        "history": history,
+        "history": [line],
     }

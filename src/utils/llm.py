@@ -5,39 +5,62 @@ provider is configured. Controlled entirely by environment variables
 
 This project is configured for Gemini by default. Anthropic/OpenAI support
 is still here (useful if you switch providers later) but only
-langchain-google-genai is required by requirements.txt — install the
-others yourself if you want them.
+langchain-google-genai is required by requirements.txt — install
+langchain-anthropic / langchain-openai yourself if you want them.
 """
 
 from __future__ import annotations
 
 import os
+from functools import lru_cache
+
+PROVIDER_KEYS = {
+    "gemini": "GOOGLE_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "openai": "OPENAI_API_KEY",
+}
 
 
+def provider() -> str:
+    return os.getenv("LLM_PROVIDER", "gemini").lower()
+
+
+def model_name() -> str:
+    return {
+        "gemini": os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+        "anthropic": os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5"),
+        "openai": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+    }.get(provider(), "?")
+
+
+def missing_api_key() -> str | None:
+    """Name of the env var that still needs to be set, or None if we're good."""
+    key = PROVIDER_KEYS.get(provider())
+    return key if key and not os.getenv(key) else None
+
+
+@lru_cache(maxsize=None)
 def get_chat_model(temperature: float = 0.0):
-    """Return a LangChain chat model based on the LLM_PROVIDER env var."""
-    provider = os.getenv("LLM_PROVIDER", "gemini").lower()
+    """Return a LangChain chat model based on the LLM_PROVIDER env var (cached)."""
+    name = provider()
 
-    if provider == "gemini":
+    if name == "gemini":
         from langchain_google_genai import ChatGoogleGenerativeAI
 
-        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-        return ChatGoogleGenerativeAI(model=model, temperature=temperature)
+        return ChatGoogleGenerativeAI(model=model_name(), temperature=temperature)
 
-    if provider == "anthropic":
+    if name == "anthropic":
         from langchain_anthropic import ChatAnthropic
 
-        model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
-        return ChatAnthropic(model=model, temperature=temperature)
+        return ChatAnthropic(model=model_name(), temperature=temperature)
 
-    if provider == "openai":
+    if name == "openai":
         from langchain_openai import ChatOpenAI
 
-        model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        return ChatOpenAI(model=model, temperature=temperature)
+        return ChatOpenAI(model=model_name(), temperature=temperature)
 
     raise ValueError(
-        f"Unknown LLM_PROVIDER='{provider}'. Use 'gemini', 'anthropic', or 'openai'."
+        f"Unknown LLM_PROVIDER='{name}'. Use 'gemini', 'anthropic', or 'openai'."
     )
 
 
@@ -50,9 +73,8 @@ def extract_text(response) -> str:
     Some providers/versions (notably recent langchain-google-genai releases)
     return `.content` as a list like [{"type": "text", "text": "..."}] or
     even a list of plain strings, instead of a single string. Every call
-    site in this project (answer_agent, critic_agent) needs a plain string,
-    so this normalizes it once instead of duplicating the same
-    isinstance-checking logic in every agent.
+    site in this project needs a plain string, so this normalizes it once
+    instead of duplicating the same isinstance-checking logic in every agent.
     """
     content = getattr(response, "content", response)
 

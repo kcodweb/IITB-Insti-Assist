@@ -1,0 +1,9 @@
+[server]
+# Streamlit's file watcher walks every module `transformers` could lazily
+# import, which floods the console with harmless torchvision errors and
+# slows down every rerun. Turn it back on while developing with:
+#   streamlit run app.py --server.fileWatcherType auto
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false
