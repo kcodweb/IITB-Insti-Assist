@@ -8,22 +8,19 @@ setting `state["next"]`.
 
 The routing logic here is deterministic (plain Python), not an LLM
 call, because the control-flow rules are simple and we want them to be
-100% predictable and cheap. (You could swap this for an LLM-based
-router — see README "Extending this project" — but a rules-based
-supervisor is easier to reason about and debug for a graded project.)
+100% predictable, cheap, and unit-testable (see tests/test_graph.py).
+Swapping in an LLM router would only mean replacing this one function.
 """
 
 from __future__ import annotations
 
+from src import config
 from src.state import AgentState
-
-MAX_REVISIONS_DEFAULT = 2
 
 
 def supervisor_node(state: AgentState) -> AgentState:
-    history = state.get("history", [])
     revision_count = state.get("revision_count", 0)
-    max_revisions = state.get("max_revisions", MAX_REVISIONS_DEFAULT)
+    max_revisions = state.get("max_revisions", config.MAX_REVISIONS)
 
     # Step 1: nothing retrieved yet -> go retrieve.
     if "retrieved_chunks" not in state:
@@ -49,5 +46,8 @@ def supervisor_node(state: AgentState) -> AgentState:
     else:
         next_node = "FINISH"
 
-    history.append(f"[supervisor] -> routing to {next_node}")
-    return {**state, "next": next_node, "history": history, "max_revisions": max_revisions}
+    return {
+        "next": next_node,
+        "max_revisions": max_revisions,
+        "history": [f"[supervisor] -> routing to {next_node}"],
+    }

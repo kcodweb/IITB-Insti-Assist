@@ -64,25 +64,69 @@ files.
   sitting right at a paragraph boundary isn't split in half between two
   chunks, losing its subject or its number.
 - **Metadata**: every chunk keeps `source` (file name) and a `chunk_id`
-  (e.g. `exam_rules.pdf#p3-chunk-1`), plus a `page` number for PDF-derived
-  chunks, which is what powers the "Sources used" / "retrieved chunks"
-  display in the UI — the assistant always shows exactly which document
-  and page it drew from.
+  (e.g. `ugrulebook.pdf#p29-chunk-1`), plus a `page` number for PDF-derived
+  chunks, which is what powers the "Sources" display in the UI — the
+  assistant always shows exactly which document and page it drew from.
 
-## 4. Multi-agent architecture
+**v2 update.** Once a labelled eval set existed (section 4), I could test
+these choices instead of reasoning about them. Two things changed:
+
+- **Section headers on every chunk.** Each chunk is now prefixed with
+  `[document | section]`, e.g. `[Academic Calendar 2026-27 | (B) SCHEDULE
+  FOR SPRING SEMESTER]`. The calendar's Autumn and Spring tables use
+  identical wording, so a bare chunk of dates from page 7 carried no clue
+  which semester it belonged to. The header restores that context for both
+  the retriever and the LLM. The ingester also strips running footers and
+  page numbers, and skips table-of-contents pages.
+- **800 / 150 instead of 500 / 100.** With the header providing context,
+  slightly larger chunks retrieved better (Hit@4 87% → 92% with the same
+  embedding model). Many rules, such as the academic-standing categories
+  and the branch-change criteria, span several sentences that only make
+  sense together.
+
+## 4. Evaluation (v2)
+
+`eval/questions.jsonl` has 68 hand-labelled questions: 52 answerable (each
+labelled with the page(s) that answer it), 8 out-of-scope, and 8 that sound
+in-scope but aren't covered by the documents. `python -m eval.run_eval`
+reports Hit@k / MRR and sweeps the relevance threshold.
+
+| Configuration | Hit@1 | Hit@4 | MRR |
+|---|---|---|---|
+| v1: MiniLM, raw pages, 500/100, dense | 77% | 88% | 0.817 |
+| v2: bge-small, cleaned + section headers, 800/150, hybrid BM25 | 87% | 100% | 0.926 |
+
+Two findings surprised me:
+- **The old 0.35 threshold was not a cosine similarity.** The Chroma
+  collection used its default squared-L2 distance, which LangChain turns
+  into a "relevance" score that can go negative (off-topic questions scored
+  around −0.14). The collection now uses cosine distance, so the threshold
+  means what it says. It was re-tuned on the eval set to 0.55: every
+  answerable question passes, and 7 of 8 off-topic questions are refused
+  before any LLM call.
+- **Keyword search mattered as much as the embedding model.** Adding BM25
+  (fused by Reciprocal Rank Fusion) was worth +4–6 points of Hit@4 on its
+  own. Questions like "What CPI is needed to apply for IDDDP?" hinge on
+  acronyms that small embedding models blur.
+
+## 5. Multi-agent architecture
 
 Four agents, coordinated with the **Supervisor** orchestration pattern:
 
 1. **Supervisor** — deterministic Python routing logic (not an LLM call) that
    reads the shared state and decides which of the other three runs next.
-2. **Retrieval Agent** — the only agent with vector-store access; runs a
-   similarity search and applies a relevance threshold (0.35) to decide
-   whether the question is actually "grounded" in the knowledge base at all.
+2. **Retrieval Agent** — the only agent with vector-store access; rewrites
+   follow-up questions into standalone queries (v2), runs a hybrid search,
+   and applies a relevance threshold (0.55 cosine in v2) to decide whether
+   the question is actually "grounded" in the knowledge base at all.
 3. **Answer Agent** — drafts an answer using only the retrieved chunks,
-   citing sources; revises if the critic rejects the draft.
-4. **Critic Agent** — an independent LLM call whose only job is to check the
-   draft against the retrieved context and reject anything unsupported,
-   returning a structured `{approved, critique}` verdict.
+   citing each claim inline as `[1]`, `[2]` (v2); revises if the critic
+   rejects the draft.
+4. **Critic Agent** — the check on the answer agent. In v2 it runs a
+   deterministic pass first (citations must point at real passages;
+   numbers that appear nowhere in the sources are flagged), then an
+   independent LLM review, and returns a structured `{approved, critique}`
+   verdict.
 
 State is threaded through all four via one shared `AgentState` TypedDict
 (a "blackboard"), with a `draft_version` / `critiqued_version` pair used to
@@ -97,32 +141,45 @@ instead of ever reaching Critique again. Version counters fixed it cleanly.
 This was caught and fixed during development using a small mocked-LLM test
 harness (routing logic tested deterministically against the happy path,
 refusal-when-ungrounded, one-revision-then-approved, and
-revision-budget-exhausted scenarios), which was removed from this submitted
-version of the repo to keep it lean but is easy to re-add if useful for
-grading — the fix itself (version counters) remains in `src/state.py`,
-`src/agents/answer_agent.py`, and `src/agents/critic_agent.py`.
+revision-budget-exhausted scenarios). The v1 submission left the harness out
+to keep the repo lean. It is back in v2 as `tests/test_graph.py`, alongside
+tests for ingestion, index rebuilds and critic parsing. The fix itself
+(version counters) remains in `src/state.py`, `src/agents/answer_agent.py`,
+and `src/agents/critic_agent.py`.
 
-## 5. Known limitations / what I'd improve with more time
+## 6. Known limitations / what I'd improve with more time
+
+Items marked ✅ were addressed in v2.
 
 - **PDF text quality depends on the source**: `pdfplumber` handles
   text-based PDFs well but can't extract anything from scanned-image PDFs
   without OCR first. Both bundled PDFs are text-based and extracted
   cleanly (64/64 pages produced usable text with no OCR needed), but this
   is worth re-checking for any additional documents added later.
-- **Critic reliability**: the critic is itself an LLM call and isn't a
-  perfect fact-checker — it reliably catches clear numeric/factual
-  mismatches but could miss a subtler misreading of the context. A stronger
-  version would use a smaller, cheaper, deterministic verifier (e.g.
-  string/entailment matching against the retrieved chunks) alongside the
-  LLM critic.
-- **Static relevance threshold**: 0.35 was chosen by manual inspection
-  rather than tuned against a labeled set of
-  in-scope/out-of-scope questions. With more time I'd build a small eval set
-  and sweep the threshold against precision/recall on "should refuse" vs.
-  "should answer" questions.
-- **No conversation memory**: each question is independent; a follow-up like
-  "what about for mid-sems?" doesn't know what "what" refers to. Adding a
-  short rolling history to the retrieval query would fix this.
+- **Critic reliability** ✅ *(partly)*: the critic is itself an LLM call and
+  isn't a perfect fact-checker. v2 adds a deterministic layer in front of
+  it: invalid citations are rejected outright, and numbers missing from the
+  sources are flagged to the LLM critic. The number check is deliberately a
+  hint rather than a hard rule, because the sources sometimes spell numbers
+  out ("eighty percent"). Proper entailment checking (e.g. a small NLI model
+  per cited sentence) would be the next step.
+- **Static relevance threshold** ✅: now tuned on the labelled eval set
+  (section 4) instead of by manual inspection. One limit remains: bge-small
+  compresses similarity scores into a narrow band, so off-topic and
+  on-topic questions overlap slightly, and 1 of 8 off-topic eval questions
+  still passes the gate. The answer and critic agents catch it, at the cost
+  of an LLM call.
+- **No conversation memory** ✅: the retrieval agent now rewrites follow-ups
+  such as "what about for mid-sems?" into standalone queries using the last
+  few turns, and the answer agent sees the conversation too.
+- **Eval set is small and self-written**: 68 questions written against these
+  two documents, and the configuration was chosen on the same set. The
+  numbers are indicative, not a held-out benchmark. The end-to-end mode
+  (`--e2e`) checks final answers but needs an API key to run.
+- **Calendar tables**: `pdfplumber` flattens the calendar's two-column
+  tables, so an event name and its date can land on different lines. The
+  LLM copes, but table-aware extraction (`page.extract_tables()`) would give
+  cleaner chunks.
 - **Single domain**: only Academic scope is implemented. The architecture
   is set up so a second scope (e.g. Hostel Life) could be added as a second
   Chroma collection with the supervisor picking which collection(s) to
